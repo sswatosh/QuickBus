@@ -1,9 +1,15 @@
 package com.sswatosh.quickbus.app;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+import com.sswatosh.nextrip.NexTripProvider;
+import com.sswatosh.nextrip.TextValuePair;
+import com.sswatosh.nextrip.TextValuePairArray;
+import org.json.JSONException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -11,6 +17,25 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        TextView mainText = (TextView) findViewById(R.id.main_text);
+
+        String text = "";
+
+        try {
+            TextValuePairArray providers = NexTripProvider.getProviders();
+            for (TextValuePair pair : providers) {
+                text = text + pair.getText() + " : " + pair.getValue() + "\n";
+            }
+        } catch (JSONException e) {
+            Log.e("MainActivity.onCreate", "Had a bad time");
+            e.printStackTrace();
+        }
+
+        if (text.equals("")) {
+            text = "It didn't work.";
+        }
+
+        mainText.setText(text);
     }
 
 

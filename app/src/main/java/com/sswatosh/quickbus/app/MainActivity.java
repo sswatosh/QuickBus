@@ -6,7 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import com.sswatosh.nextrip.NexTripProvider;
+import com.sswatosh.nextrip.NexTripObjectProvider;
 import com.sswatosh.nextrip.TextValuePair;
 import com.sswatosh.nextrip.TextValuePairArray;
 import org.json.JSONException;
@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
         String text = "";
 
         try {
-            TextValuePairArray providers = NexTripProvider.getProviders();
+            TextValuePairArray providers = NexTripObjectProvider.getProviders();
             for (TextValuePair pair : providers) {
                 text = text + pair.getText() + " : " + pair.getValue() + "\n";
             }

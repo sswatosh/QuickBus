@@ -14,24 +14,49 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class NexTripProvider {
+public class NexTripObjectProvider {
 
     private static final String baseURL = "http://svc.metrotransit.org/NexTrip/";
     private static final String jsonFormat = "?format=json";
     private static final String PROVIDERS = "Providers";
+    private static final String STOPS = "Stops";
+    private static final String ROUTES = "Routes";
+    private static final String DIRECTIONS = "Directions";
 
     public static TextValuePairArray getProviders() throws JSONException {
         String json = request(PROVIDERS);
         return new TextValuePairArray(new JSONArray(json));
     }
 
-    private static String request(String requestPath) {
+    public static RouteArray getRoutes() throws JSONException {
+        String json = request(ROUTES);
+        return new RouteArray(new JSONArray(json));
+    }
+
+    public static TextValuePairArray getDirections(String route) throws JSONException {
+        String json = request(DIRECTIONS, route);
+        return new TextValuePairArray(new JSONArray(json));
+    }
+
+    public static TextValuePairArray getStops(String route, String direction) throws JSONException {
+        String json = request(STOPS, route, direction);
+        return new TextValuePairArray(new JSONArray(json));
+    }
+
+
+    private static String request(String... segments) {
+        String path = "";
+        for (int i = 0; i < segments.length - 1; i++) {
+            path += segments[i] + "/";
+        }
+        path += segments[segments.length-1];
+
         try {
-            String response = new NexTripRequest().execute(requestPath).get(10, TimeUnit.SECONDS);
-            Log.d("NexTripProvider", response);
+            String response = new NexTripRequest().execute(path).get(10, TimeUnit.SECONDS);
+            Log.d("NexTripObjectProvider", response);
             return response;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            Log.w("NexTripProvider", "NexTrip request failed.");
+            Log.w("NexTripObjectProvider", "NexTrip request failed.");
             e.printStackTrace();
             return null;
         }
@@ -57,11 +82,11 @@ public class NexTripProvider {
                 }
 
             } catch (MalformedURLException e) {
-                Log.e("NexTripProvider", "Bad NexTrip URL: " + baseURL + requestPath);
+                Log.e("NexTripObjectProvider", "Bad NexTrip URL: " + baseURL + requestPath);
                 e.printStackTrace();
                 return null;
             } catch (IOException e) {
-                Log.e("NexTripProvider", "NexTrip connection failed.");
+                Log.e("NexTripObjectProvider", "NexTrip connection failed.");
                 e.printStackTrace();
                 return null;
             }

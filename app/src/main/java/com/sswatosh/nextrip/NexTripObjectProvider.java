@@ -43,6 +43,11 @@ public class NexTripObjectProvider {
         return new TextValuePairArray(new JSONArray(json));
     }
 
+    public static DepartureArray getDepartures(String route, String direction, String stop) throws JSONException {
+        String json = request(route, direction, stop);
+        return new DepartureArray(new JSONArray(json));
+    }
+
 
     private static String request(String... segments) {
         String path = "";

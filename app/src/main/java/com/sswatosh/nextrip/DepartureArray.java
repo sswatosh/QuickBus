@@ -4,7 +4,9 @@ package com.sswatosh.nextrip;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class DepartureArray implements Iterable<Departure> {
     private JSONArray array;
@@ -15,6 +17,16 @@ public class DepartureArray implements Iterable<Departure> {
 
     public Departure get(int i) throws JSONException {
         return new Departure(array.getJSONObject(i));
+    }
+
+    public List<Departure> getActualDepartures() throws JSONException {
+        List<Departure> departures = new ArrayList<>();
+        for (Departure departure : this) {
+            if (departure.getActual()) {
+                departures.add(departure);
+            }
+        }
+        return departures;
     }
 
     public int length() {

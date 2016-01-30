@@ -25,7 +25,9 @@ public class Departure {
     }
 
     public LocalDateTime getDepartureTime() throws JSONException {
-        return LocalDateTime.parse(departure.getString("DepartureTime"));
+        String stringDate = departure.getString("DepartureTime");
+        long millis = Long.parseLong(stringDate.substring(6,19));
+        return new LocalDateTime(millis);
     }
 
     public String getDescription() throws JSONException {

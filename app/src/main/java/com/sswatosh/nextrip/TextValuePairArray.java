@@ -3,6 +3,7 @@ package com.sswatosh.nextrip;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
 import java.util.Iterator;
 
 public class TextValuePairArray implements Iterable<TextValuePair>{

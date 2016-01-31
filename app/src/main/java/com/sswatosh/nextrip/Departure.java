@@ -1,7 +1,7 @@
 package com.sswatosh.nextrip;
 
 
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,10 +24,8 @@ public class Departure {
         return departure.getString("DepartureText");
     }
 
-    public LocalDateTime getDepartureTime() throws JSONException {
-        String stringDate = departure.getString("DepartureTime");
-        long millis = Long.parseLong(stringDate.substring(6,19));
-        return new LocalDateTime(millis);
+    public DateTime getDepartureTime() throws JSONException {
+        return Utils.NexTripJSONDateToDateTime(departure.getString("DepartureTime"));
     }
 
     public String getDescription() throws JSONException {

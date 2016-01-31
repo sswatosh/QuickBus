@@ -7,10 +7,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import com.sswatosh.nextrip.*;
+import com.sswatosh.nextrip.Departure;
+import com.sswatosh.nextrip.DepartureArray;
+import com.sswatosh.nextrip.NexTripObjectProvider;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
 import org.json.JSONException;
 
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView eveningBus1;
     private TextView eveningBus2;
 
-    private LocalDateTime lastRefreshTime;
+    private DateTime lastRefreshTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,15 +56,13 @@ public class MainActivity extends AppCompatActivity {
             eveningBus2.setText(savedInstanceState.getString(EVENING_BUS_2_TEXT));
             eveningBus2.setTextColor(savedInstanceState.getInt(EVENING_BUS_2_COLOR));
 
-            lastRefreshTime = LocalDateTime.parse(savedInstanceState.getString(LAST_REFRESH_TIME));
+            lastRefreshTime = DateTime.parse(savedInstanceState.getString(LAST_REFRESH_TIME));
         }
 
-        LocalDateTime currentTime = LocalDateTime.now();
+        DateTime currentTime = DateTime.now();
 
         if (lastRefreshTime != null) {
-            DateTime currentDateTime = currentTime.toDateTime();
-            DateTime lastRefreshDateTime = lastRefreshTime.toDateTime();
-            Duration sinceRefresh = new Duration(lastRefreshDateTime.toInstant(), currentDateTime.toInstant());
+            Duration sinceRefresh = new Duration(lastRefreshTime.toInstant(), currentTime.toInstant());
             if (sinceRefresh.getStandardSeconds() > MIN_REFRESH_SECONDS) {
                 refreshBusTimes();
             }
@@ -73,8 +72,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refreshBusTimes() {
-        Log.d("REFRESHER", "REFRESHING!!!");
-        LocalDateTime currentTime = LocalDateTime.now();
+        DateTime currentTime = DateTime.now();
         lastRefreshTime = currentTime;
 
         // get morning buses

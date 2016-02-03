@@ -8,12 +8,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import com.sswatosh.nextrip.Departure;
-import com.sswatosh.nextrip.DepartureArray;
 import com.sswatosh.nextrip.NexTripObjectProvider;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.json.JSONException;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String MORNING_BUS_1_TEXT = "morningBus1Text";
@@ -77,9 +78,9 @@ public class MainActivity extends AppCompatActivity {
 
         // get morning buses
         try {
-            DepartureArray departures = NexTripObjectProvider.getDepartures("17", "2", "LAFR");
+            List<Departure> departures = NexTripObjectProvider.getDepartures("17", "2", "LAFR");
 
-            if (departures.length() > 0) {
+            if (departures.size() > 0) {
                 Departure firstDeparture = departures.get(0);
                 if (firstDeparture.getActual()) {
                     Period timeDifference = new Period(currentTime, firstDeparture.getDepartureTime());
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            if (departures.length() > 1) {
+            if (departures.size() > 1) {
                 Departure firstDeparture = departures.get(1);
                 if (firstDeparture.getActual()) {
                     Period timeDifference = new Period(currentTime, firstDeparture.getDepartureTime());
@@ -107,9 +108,9 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             // get evening buses
-            DepartureArray departures = NexTripObjectProvider.getDepartures("17", "3", "GRNI");
+            List<Departure> departures = NexTripObjectProvider.getDepartures("17", "3", "GRNI");
 
-            if (departures.length() > 0) {
+            if (departures.size() > 0) {
                 Departure firstDeparture = departures.get(0);
                 if (firstDeparture.getActual()) {
                     Period timeDifference = new Period(currentTime, firstDeparture.getDepartureTime());
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            if (departures.length() > 1) {
+            if (departures.size() > 1) {
                 Departure firstDeparture = departures.get(1);
                 if (firstDeparture.getActual()) {
                     Period timeDifference = new Period(currentTime, firstDeparture.getDepartureTime());

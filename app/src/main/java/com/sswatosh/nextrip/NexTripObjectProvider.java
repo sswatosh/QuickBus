@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -23,29 +25,49 @@ public class NexTripObjectProvider {
     private static final String ROUTES = "Routes";
     private static final String DIRECTIONS = "Directions";
 
-    public static TextValuePairArray getProviders() throws JSONException {
+    public static List<TextValuePair> getProviders() throws JSONException {
         String json = request(PROVIDERS);
-        return new TextValuePairArray(new JSONArray(json));
+        return jsonToTextValuePairs(json);
     }
 
-    public static RouteArray getRoutes() throws JSONException {
+    public static List<Route> getRoutes() throws JSONException {
         String json = request(ROUTES);
-        return new RouteArray(new JSONArray(json));
+        JSONArray jsonArray = new JSONArray(json);
+        List<Route> routes = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            routes.add(new Route(jsonArray.getJSONObject(i)));
+        }
+        return routes;
     }
 
-    public static TextValuePairArray getDirections(String route) throws JSONException {
+    public static List<TextValuePair> getDirections(String route) throws JSONException {
         String json = request(DIRECTIONS, route);
-        return new TextValuePairArray(new JSONArray(json));
+        return jsonToTextValuePairs(json);
     }
 
-    public static TextValuePairArray getStops(String route, String direction) throws JSONException {
+    public static List<TextValuePair> getStops(String route, String direction) throws JSONException {
         String json = request(STOPS, route, direction);
-        return new TextValuePairArray(new JSONArray(json));
+        return jsonToTextValuePairs(json);
     }
 
-    public static DepartureArray getDepartures(String route, String direction, String stop) throws JSONException {
+    public static List<Departure> getDepartures(String route, String direction, String stop) throws JSONException {
         String json = request(route, direction, stop);
-        return new DepartureArray(new JSONArray(json));
+        JSONArray jsonArray = new JSONArray(json);
+        List<Departure> departures = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            departures.add(new Departure(jsonArray.getJSONObject(i)));
+        }
+        return departures;
+    }
+
+
+    private static List<TextValuePair> jsonToTextValuePairs(String json) throws JSONException {
+        JSONArray jsonArray = new JSONArray(json);
+        List<TextValuePair> pairs = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            pairs.add(new TextValuePair(jsonArray.getJSONObject(i)));
+        }
+        return pairs;
     }
 
 

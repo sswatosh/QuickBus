@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import com.google.common.collect.Lists;
 import com.sswatosh.nextrip.Departure;
 import com.sswatosh.nextrip.NexTripObjectProvider;
 import org.joda.time.DateTime;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 if (firstDeparture.getActual()) {
                     Period timeDifference = new Period(currentTime, firstDeparture.getDepartureTime());
                     morningBus1.setText(String.valueOf(timeDifference.getMinutes()) + " minutes");
+                    morningBus1.setTextColor(Color.GRAY);
                 } else {
                     morningBus1.setText(firstDeparture.getDepartureText());
                     morningBus1.setTextColor(Color.RED);
@@ -96,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
                 if (firstDeparture.getActual()) {
                     Period timeDifference = new Period(currentTime, firstDeparture.getDepartureTime());
                     morningBus2.setText(String.valueOf(timeDifference.getMinutes()) + " minutes");
+                    morningBus2.setTextColor(Color.GRAY);
                 } else {
                     morningBus2.setText(firstDeparture.getDepartureText());
                     morningBus2.setTextColor(Color.RED);
@@ -108,13 +111,15 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             // get evening buses
-            List<Departure> departures = NexTripObjectProvider.getDepartures("17", "3", "GRNI");
+            List<String> disallowedTerminals = Lists.newArrayList("A");
+            List<Departure> departures = NexTripObjectProvider.getDepartures("17", "3", "GRNI", null, disallowedTerminals);
 
             if (departures.size() > 0) {
                 Departure firstDeparture = departures.get(0);
                 if (firstDeparture.getActual()) {
                     Period timeDifference = new Period(currentTime, firstDeparture.getDepartureTime());
-                    eveningBus1.setText(String.valueOf(timeDifference.getMinutes()) + " minutes");
+                    eveningBus1.setText(String.valueOf(timeDifference.getMinutes()) + " min");
+                    eveningBus1.setTextColor(Color.GRAY);
                 } else {
                     eveningBus1.setText(firstDeparture.getDepartureText());
                     eveningBus1.setTextColor(Color.RED);
@@ -125,7 +130,8 @@ public class MainActivity extends AppCompatActivity {
                 Departure firstDeparture = departures.get(1);
                 if (firstDeparture.getActual()) {
                     Period timeDifference = new Period(currentTime, firstDeparture.getDepartureTime());
-                    eveningBus2.setText(String.valueOf(timeDifference.getMinutes()) + " minutes");
+                    eveningBus2.setText(String.valueOf(timeDifference.getMinutes()) + " min");
+                    eveningBus2.setTextColor(Color.GRAY);
                 } else {
                     eveningBus2.setText(firstDeparture.getDepartureText());
                     eveningBus2.setTextColor(Color.RED);

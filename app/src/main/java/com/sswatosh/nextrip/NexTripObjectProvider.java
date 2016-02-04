@@ -1,6 +1,7 @@
 package com.sswatosh.nextrip;
 
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -11,6 +12,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -51,12 +53,40 @@ public class NexTripObjectProvider {
     }
 
     public static List<Departure> getDepartures(String route, String direction, String stop) throws JSONException {
+        return getDepartures(route, direction, stop, null, null);
+    }
+
+    public static List<Departure> getDepartures(String route, String direction, String stop,
+                                                @Nullable List<String> allowedTerminals, @Nullable List<String> disallowedTerminals) throws JSONException {
         String json = request(route, direction, stop);
         JSONArray jsonArray = new JSONArray(json);
         List<Departure> departures = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             departures.add(new Departure(jsonArray.getJSONObject(i)));
         }
+
+        if (allowedTerminals != null) {
+            Iterator<Departure> iterator = departures.iterator();
+            while (iterator.hasNext()) {
+                Departure departure = iterator.next();
+                if (!allowedTerminals.contains(departure.getTerminal())) {
+                    iterator.remove();
+                    Log.d("getDepartures", "Ignoring bus with terminal: " + departure.getTerminal());
+                }
+            }
+        }
+
+        if (disallowedTerminals != null) {
+            Iterator<Departure> iterator = departures.iterator();
+            while (iterator.hasNext()) {
+                Departure departure = iterator.next();
+                if (disallowedTerminals.contains(departure.getTerminal())) {
+                    iterator.remove();
+                    Log.d("getDepartures", "Ignoring bus with terminal: " + departure.getTerminal());
+                }
+            }
+        }
+
         return departures;
     }
 
@@ -80,7 +110,6 @@ public class NexTripObjectProvider {
 
         try {
             String response = new NexTripRequest().execute(path).get(10, TimeUnit.SECONDS);
-            Log.d("NexTripObjectProvider", response);
             return response;
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             Log.w("NexTripObjectProvider", "NexTrip request failed.");

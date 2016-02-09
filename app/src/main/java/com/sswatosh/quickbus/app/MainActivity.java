@@ -2,6 +2,9 @@ package com.sswatosh.quickbus.app;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -29,7 +32,10 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LAST_REFRESH_TIME = "lastRefreshTime";
 
-    private static final int MIN_REFRESH_SECONDS = 32;
+    private static final int MIN_REFRESH_SECONDS = 31;
+    private static final long MIN_REFRESH_MILLIS = MIN_REFRESH_SECONDS * 1000;
+
+    private static final int REFRESH_MESSAGE = 0;
     
     private TextView morningBus1;
     private TextView morningBus2;
@@ -37,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView eveningBus2;
 
     private DateTime lastRefreshTime;
+
+    private Handler refreshHandler;
+
+    private boolean isActive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +71,38 @@ public class MainActivity extends AppCompatActivity {
             lastRefreshTime = DateTime.parse(savedInstanceState.getString(LAST_REFRESH_TIME));
         }
 
-        DateTime currentTime = DateTime.now();
+        refreshHandler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                if (isActive) {
+                    refreshUI();
+                }
+            }
+        };
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isActive = true;
+        refreshUI();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isActive = false;
+        refreshHandler.removeMessages(REFRESH_MESSAGE);
+    }
+
+    private void refreshUI() {
         if (lastRefreshTime != null) {
+            DateTime currentTime = DateTime.now();
             Duration sinceRefresh = new Duration(lastRefreshTime.toInstant(), currentTime.toInstant());
-            if (sinceRefresh.getStandardSeconds() > MIN_REFRESH_SECONDS) {
+            if (sinceRefresh.getMillis() > MIN_REFRESH_MILLIS) {
                 refreshBusTimes();
+            } else {
+                refreshHandler.sendEmptyMessageDelayed(REFRESH_MESSAGE, MIN_REFRESH_MILLIS - sinceRefresh.getMillis() + 500);
             }
         } else {
             refreshBusTimes();
@@ -141,6 +177,8 @@ public class MainActivity extends AppCompatActivity {
             Log.e("MainActivity.onCreate", "Error getting evening buses.");
             e.printStackTrace();
         }
+
+        refreshHandler.sendEmptyMessageDelayed(REFRESH_MESSAGE, MIN_REFRESH_MILLIS);
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.json.JSONException;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Handler refreshHandler;
 
-    private boolean isActive = false;
+    private boolean active = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,28 +72,43 @@ public class MainActivity extends AppCompatActivity {
             lastRefreshTime = DateTime.parse(savedInstanceState.getString(LAST_REFRESH_TIME));
         }
 
-        refreshHandler = new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(Message msg) {
-                if (isActive) {
-                    refreshUI();
-                }
-            }
-        };
+        refreshHandler = new RefreshHandler(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        isActive = true;
+        active = true;
         refreshUI();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        isActive = false;
+        active = false;
         refreshHandler.removeMessages(REFRESH_MESSAGE);
+    }
+
+    private static class RefreshHandler extends Handler {
+        private final WeakReference<MainActivity> mainActivityReference;
+
+        RefreshHandler(MainActivity mainActivityReference) {
+            this.mainActivityReference = new WeakReference<>(mainActivityReference);
+        }
+        
+        @Override
+        public void handleMessage(Message msg) {
+            MainActivity activity = mainActivityReference.get();
+            if (activity != null && activity.isActive()) {
+                activity.refreshUI();
+            }
+        }
+
+
+    }
+
+    private boolean isActive() {
+        return this.active;
     }
 
     private void refreshUI() {
